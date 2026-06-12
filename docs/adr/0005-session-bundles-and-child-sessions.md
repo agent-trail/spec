@@ -14,7 +14,7 @@ External subagents and forked transcripts are modeled as child sessions. The dur
 { "fork_from": { "session_id": "<parent-session-id>", "entry_id": "<parent-event-id>" } }
 ```
 
-`entry_id` is emitted only when the source exposes a clear parent event. `content_hash` is optional best effort and refers to the parent session-level content hash when known.
+`fork_from.session_id` is the durable Agent Trail `id` of the parent session header. It is not `session_uid`, which identifies a logical source session across segments. `entry_id` is optional and is emitted only when the source exposes a clear parent event. `content_hash` is optional best effort and refers to the parent session-level content hash when known.
 
 Parent events may also carry a source-visible child session id when the adapter can link the child confidently. Runtime ids that are not durable Agent Trail header ids stay in metadata or `source.raw`.
 

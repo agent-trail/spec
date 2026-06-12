@@ -12,7 +12,9 @@ Structural discriminators gate parser or renderer dispatch and require a format 
 
 Descriptive state vocabulary accepts reserved values plus vendor-namespaced extensions of the form `x-<vendor>/<name>`. Bare unknown strings remain writer-strict errors. Readers treat unknown `x-<vendor>/<name>` values as opaque strings and pass them through.
 
-Current extensible vocabulary includes `scope`, `reason`, `trigger`, `origin`, `command_invoke.kind`, `command_invoke.via`, and `command_invoke.result_action` slots that describe observed runtime state rather than dispatch shape. It also includes established extension surfaces such as `system_event.kind`, `vcs.type`, `session_metadata_update.field`, and custom `agent.name`.
+Current extensible vocabulary includes `scope`, `reason`, `trigger`, `origin`, `command_invoke.kind`, `command_invoke.via`, and `command_invoke.result_action` slots that describe observed runtime state rather than dispatch shape. It also includes established extension surfaces such as `system_event.kind`, `vcs.type`, and `session_metadata_update.field`.
+
+`agent.name` follows the same two-part contract: registered canonical names come from the canonical agent registry, while unregistered agents use `x-<vendor>/<name>`. Readers treat unknown `x-<vendor>/<name>` agent names as opaque strings and pass them through.
 
 An `x-<vendor>/<name>` value observed across two or more adapters can be promoted into the reserved enum in a minor format bump. This follows the convention already stated for `system_event.kind` in the events section.
 

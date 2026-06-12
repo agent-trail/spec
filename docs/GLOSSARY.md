@@ -48,6 +48,10 @@ Avoid: multi-transcript, merged session.
 A separate session group or external session spawned or forked from another session, linked by the child header's `fork_from`.
 Avoid: subtree, branch, sidechain when the source stores a separate transcript.
 
+**Session id**:
+The durable Agent Trail `id` on a session header. `fork_from.session_id` references this header id, not `session_uid`.
+Avoid: source session id.
+
 **Session segment**:
 One trail-file artifact carrying part of a logical source session. Segments are linked by `session_uid` and ordered by `segment.seq`.
 Avoid: session shard, chunk.

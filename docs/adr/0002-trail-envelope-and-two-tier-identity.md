@@ -6,7 +6,7 @@ Accepted.
 
 ## Decision
 
-A trail file may carry file-level concerns on an optional `type:"trail"` record at line 1. This record is the trail envelope. It carries file-level metadata, file label, file-scope hash, optional sessions manifest, and extensions instead of overloading the session header.
+A trail file may carry file-level concerns on an optional `type:"trail"` record at line 1. This record is the trail envelope. It carries file-level metadata, optional human-facing `name`, file-scope hash, optional sessions manifest, and extensions instead of overloading the session header.
 
 When the envelope is absent, behavior is unchanged. When present, the session header follows on line 2, and at most one envelope is allowed per file. This decouples file scope from session scope and reserves the structural slot for session bundles.
 
