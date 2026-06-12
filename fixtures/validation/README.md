@@ -30,7 +30,7 @@ const path = fileURLToPath(new URL("valid/minimal-linear.trail.jsonl", FIXTURES)
 <!-- conformance-manifest:start -->
 ## Scenarios
 
-This section is generated from `manifest.json`; run `bun run sync:conformance` after fixture or expectation changes.
+This section is generated from `manifest.json`; run `mise run check:conformance` after fixture or expectation changes.
 
 ### hash-mismatch/
 
