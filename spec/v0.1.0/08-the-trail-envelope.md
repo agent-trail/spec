@@ -43,29 +43,29 @@ The trail envelope is an OPTIONAL record on line 1 that carries file-scope metad
 | `description` | no | string | free text |
 | `ts` | yes | string | ISO-8601 timestamp when the file was assembled or exported |
 | `producer` | yes | string | identifier of the writer (e.g., `trail-cli/0.3.0`) |
-| `content_hash` | no | string | SHA-256 hex of the whole-file canonical bytes; see §7.4 |
+| `content_hash` | no | string | SHA-256 hex of the whole-file canonical bytes; see [§7.4](./07-identity-artifacts-and-content-addressing.md#74-two-tier-identity) |
 | `tags` | no | string[] | free-form labels |
 | `vcs` | no | object | working-tree context at file-assembly time |
 | `fork_from` | no | object | reference to a parent file when forked; `trail_id` is a UUID or ULID id and `content_hash` is optional |
 | `redacted_from` | no | object | provenance link from a redacted file to its raw counterpart |
 | `sessions` | no | array | manifest of sessions in this file; validator warns on drift vs file content |
-| `meta` | no | object | free-form vendor extensions (§8.3) |
+| `meta` | no | object | free-form vendor extensions ([§8.3](#83-the-meta-extension-convention)) |
 
 The envelope MUST NOT carry a `parent_id`. It is not part of the event graph.
 
 ### 8.3 The `meta` extension convention
 
-The trail envelope (§8), the session header (§9), and every event entry (§10.1) accept an optional `meta` object for vendor extensions, modelled on OCI image annotations and Kubernetes `metadata.annotations`. Object-typed values are allowed so nested data fits naturally. Keys SHOULD use the `x-<vendor>/<name>` extension grammar (§12.1) to avoid collisions (`x-example/team`, `x-acme/build_id`, `x-entire/checkpoint_id`). The validator treats `meta` as opaque; it contributes to whichever `content_hash` tier covers its host record (§7.4): `meta` on the session header or any event entry feeds the session-level hash, and `meta` on the trail envelope feeds the file-level hash.
+The trail envelope ([§8](#8-the-trail-envelope)), the session header ([§9](./09-the-session-header.md#9-the-session-header)), and every event entry ([§10.1](./10-events.md#101-base-shape)) accept an optional `meta` object for vendor extensions, modelled on OCI image annotations and Kubernetes `metadata.annotations`. Object-typed values are allowed so nested data fits naturally. Keys SHOULD use the `x-<vendor>/<name>` extension grammar ([§12.1](./12-vendor-extensions.md#121-extension-grammar)) to avoid collisions (`x-example/team`, `x-acme/build_id`, `x-entire/checkpoint_id`). The validator treats `meta` as opaque; it contributes to whichever `content_hash` tier covers its host record ([§7.4](./07-identity-artifacts-and-content-addressing.md#74-two-tier-identity)): `meta` on the session header or any event entry feeds the session-level hash, and `meta` on the trail envelope feeds the file-level hash.
 
 For verbatim source-event preservation, use `source.raw` ([§10.1](./10-events.md#101-base-shape), [§10.7](./10-events.md#107-source-envelope-referencing), [§15.1](./15-truncation-overflow-and-raw-source-size.md#151-sourceraw-elision-and-redaction)) instead — `meta` is for cross-cutting annotations, not for capturing the source envelope.
 
-This draft defines one standard event-entry `meta` key: `redaction_count` (§16). Other standard keys MAY be promoted in later minor bumps based on observed usage.
+This draft defines one standard event-entry `meta` key: `redaction_count` ([§16](./16-redaction.md#16-redaction)). Other standard keys MAY be promoted in later minor bumps based on observed usage.
 
 ### 8.4 The `sessions` manifest
 
 When `sessions` is present, the validator warns if the manifest disagrees with the file:
 
-- The manifest MUST list one entry per session group (§9.6) in file order. Each entry's `id` and `agent` MUST match the corresponding session header's `id` and `agent.name`. Length mismatch and per-entry drift both emit `envelope_sessions_manifest_drift` warnings — never errors, so renderers can still display the file.
+- The manifest MUST list one entry per session group ([§9.6](./09-the-session-header.md#96-multi-session-trail-files)) in file order. Each entry's `id` and `agent` MUST match the corresponding session header's `id` and `agent.name`. Length mismatch and per-entry drift both emit `envelope_sessions_manifest_drift` warnings — never errors, so renderers can still display the file.
 - The manifest is an index/rendering hint only. It MUST NOT carry graph facts such as child-session role or follows edges; session headers are authoritative for lineage.
 
 ### 8.5 File identity defaults when envelope is absent

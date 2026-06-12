@@ -59,7 +59,7 @@
 |---|---|---|---|
 | `type` | yes | literal `"session"` | discriminator |
 | `schema_version` | yes | string | currently `"0.1.0"` |
-| `id` | yes | string | UUID or ULID per §7.1/§19 |
+| `id` | yes | string | UUID or ULID per [§7.1](./07-identity-artifacts-and-content-addressing.md#71-session-identity)/[§19](./19-formal-schema.md#19-formal-schema) |
 | `session_uid` | no | string | stable source-session identifier shared by all segments of one logical source session |
 | `segment` | no | object | multi-segment marker; absent is equivalent to a single segment with `seq: 1` |
 | `segment.seq` | yes (if `segment` present) | integer | 1-based segment sequence number |
@@ -67,10 +67,10 @@
 | `name` | no | string | human session label |
 | `description` | no | string | free-text session description |
 | `tags` | no | string[] | free-form session labels |
-| `content_hash` | no | string | SHA-256 hex of this artifact; see §7.3 |
+| `content_hash` | no | string | SHA-256 hex of this artifact; see [§7.3](./07-identity-artifacts-and-content-addressing.md#73-content-hash) |
 | `ts` | yes | string | ISO-8601 session start time; writers emit UTC `Z` with millisecond precision |
-| `stream` | no | object | live-capture marker; see §9.4 |
-| `agent.name` | yes | string | from the canonical registry (§14) |
+| `stream` | no | object | live-capture marker; see [§9.4](#94-streaming-and-live-capture) |
+| `agent.name` | yes | string | from the canonical registry ([§14](./14-canonical-agent-registry.md#14-canonical-agent-registry)) |
 | `agent.version` | no | string | source agent's version |
 | `agent.model_default` | no | string | default model for the session |
 | `cwd` | no | string | working directory; MAY be normalized for privacy |
@@ -92,9 +92,9 @@
 | `parse_fidelity.quarantined_count` | yes (if `parse_fidelity` present) | integer | number of `system_event` entries whose `payload.kind` is `x-*/unknown_record` in this session group |
 | `parse_fidelity.termination_reason` | no | enum or extension | final `session_terminated.payload.reason`, when a `session_terminated` event is present |
 | `source` | no | object | source-file metadata block (agent, path, format_version) |
-| `meta` | no | object | vendor extensions; recommended keys use the `x-<vendor>/<name>` extension grammar (§8.3 / §12) |
+| `meta` | no | object | vendor extensions; recommended keys use the `x-<vendor>/<name>` extension grammar ([§8.3](./08-the-trail-envelope.md#83-the-meta-extension-convention) / [§12](./12-vendor-extensions.md#12-vendor-extensions)) |
 
-When `parse_fidelity` is present, validators MUST compare it against the session group's entries. `quarantined_count` MUST equal the count of quarantined unknown source records emitted as `system_event` entries with `payload.kind` matching `x-*/unknown_record`; see the §10.3 quarantine convention. `termination_reason`, when a `session_terminated` entry exists, MUST match the final `session_terminated.payload.reason`; if no `session_terminated` entry exists, writers MUST omit `termination_reason`. This field is denormalized for cheap listing/filtering only; the event stream remains authoritative. Quarantined records are suspect parse fidelity, not necessarily lossy, because the raw source record is preserved.
+When `parse_fidelity` is present, validators MUST compare it against the session group's entries. `quarantined_count` MUST equal the count of quarantined unknown source records emitted as `system_event` entries with `payload.kind` matching `x-*/unknown_record`; see the [§10.3](./10-events.md#103-optional-event-types) quarantine convention. `termination_reason`, when a `session_terminated` entry exists, MUST match the final `session_terminated.payload.reason`; if no `session_terminated` entry exists, writers MUST omit `termination_reason`. This field is denormalized for cheap listing/filtering only; the event stream remains authoritative. Quarantined records are suspect parse fidelity, not necessarily lossy, because the raw source record is preserved.
 
 `vcs.remote_url` provides a canonical project identifier that survives across users, machines, and clones — useful for cross-machine aggregation, profile filtering, and project-scoped analysis. Adapters that populate it:
 
@@ -106,9 +106,9 @@ When `parse_fidelity` is present, validators MUST compare it against the session
 
 Fresh repositories with an unborn HEAD MAY emit `vcs.revision:null` when a branch is known. A `vcs` block with `vcs.revision:null` MUST include `vcs.branch`, MUST omit `vcs.head_commit`, and writers MUST NOT emit an information-free VCS block. When `vcs.revision` is non-null for git, `vcs.head_commit` typically equals `vcs.revision`.
 
-Privacy: `remote_url` reveals repository identity and MAY identify a private repo. Redacted artifacts MAY strip or normalize it (§16).
+Privacy: `remote_url` reveals repository identity and MAY identify a private repo. Redacted artifacts MAY strip or normalize it ([§16](./16-redaction.md#16-redaction)).
 
-When a trail file carries both header-level `vcs` (session-time context) and envelope-level `vcs` (file-assembly-time context, §8), they represent different observation points. File-assembly tools SHOULD preserve both when present. For multi-segment reconciliation rules, see §9.5.
+When a trail file carries both header-level `vcs` (session-time context) and envelope-level `vcs` (file-assembly-time context, [§8](./08-the-trail-envelope.md#8-the-trail-envelope)), they represent different observation points. File-assembly tools SHOULD preserve both when present. For multi-segment reconciliation rules, see [§9.5](#95-session-segments-multi-segment-sessions).
 
 ### 9.3 Example
 
@@ -125,19 +125,19 @@ The optional header `stream` object:
 | Field | Required | Type | Notes |
 |---|---|---|---|
 | `stream.state` | yes (if `stream` present) | enum | `open` while the writer is actively appending; `closed` once finalized |
-| `stream.started_at` | no | string | ISO-8601 timestamp when the stream began; matches the §9 `ts` semantics |
+| `stream.started_at` | no | string | ISO-8601 timestamp when the stream began; matches the [§9](#9-the-session-header) `ts` semantics |
 
 Lifecycle:
 
 1. **Live phase.** Writer emits the header with `stream: { state: "open" }`. `content_hash` is omitted or set to `"<pending>"`. Events are appended as they happen.
-2. **Finalize.** Writer rewrites the header with `stream` either removed or set to `state: "closed"`, then computes `content_hash` per §7.3. Appending stops.
-3. **Clean end.** Writer MAY append a `session_end` event (§10.3) to mark a normal conclusion before finalize. Abnormal ends still use `session_terminated`.
+2. **Finalize.** Writer rewrites the header with `stream` either removed or set to `state: "closed"`, then computes `content_hash` per [§7.3](./07-identity-artifacts-and-content-addressing.md#73-content-hash). Appending stops.
+3. **Clean end.** Writer MAY append a `session_end` event ([§10.3](./10-events.md#103-optional-event-types)) to mark a normal conclusion before finalize. Abnormal ends still use `session_terminated`.
 
 Tail readers that observe `stream.state == "open"` SHOULD assume more events MAY arrive. Readers observing `stream` absent or `state == "closed"` SHOULD treat the file as a finalized artifact and verify `content_hash` when present.
 
 `stream` is absent in trail files produced by stream-unaware writers; readers MUST treat that case as equivalent to a finalized non-streaming artifact (existing v0.1.0 behavior).
 
-A live `system_event` heartbeat convention is described in §10.3.
+A live `system_event` heartbeat convention is described in [§10.3](./10-events.md#103-optional-event-types).
 
 ---
 
@@ -149,7 +149,7 @@ A single logical source session MAY be split across multiple trail-file artifact
 
 - `segment.seq` — 1-based integer identifying which segment of the session this file is. Single-segment trails MAY omit `segment` entirely, which is equivalent to `{seq: 1}`.
 
-- `segment.prev_content_hash` — the **session-level** `content_hash` (§7.3) of the previous segment's finalized bytes. Required when `seq >= 2`. Forms a verifiable chain (HLS / Postgres-WAL pattern). If the previous segment was lost and the chain cannot be verified, writers MAY emit `null` and readers MUST emit a `segment_chain_break` warning.
+- `segment.prev_content_hash` — the **session-level** `content_hash` ([§7.3](./07-identity-artifacts-and-content-addressing.md#73-content-hash)) of the previous segment's finalized bytes. Required when `seq >= 2`. Forms a verifiable chain (HLS / Postgres-WAL pattern). If the previous segment was lost and the chain cannot be verified, writers MAY emit `null` and readers MUST emit a `segment_chain_break` warning.
 
 #### Segment reconciliation
 
@@ -161,18 +161,18 @@ and emit a new finalized trail with freshly computed hashes.
 
 Implementation merge policy is documented in `docs/implementation-semantics.md`.
 
-Whole-file graph rules (§18) apply **within** a segment, not across. Cross-segment references are out of scope for v0.1 (event `parent_id` chains do not span segments).
+Whole-file graph rules ([§18](./18-validation.md#18-validation)) apply **within** a segment, not across. Cross-segment references are out of scope for v0.1 (event `parent_id` chains do not span segments).
 
 #### Writer guidance
 
 - Writers SHOULD generate `session_uid` once per source session and reuse it for every segment.
 - Writers SHOULD finalize each segment normally before starting a new segment.
-- To produce `segment.prev_content_hash` for segment N, finalize segment N-1 per §7.3 and copy its session-level `content_hash` verbatim into segment N's header.
+- To produce `segment.prev_content_hash` for segment N, finalize segment N-1 per [§7.3](./07-identity-artifacts-and-content-addressing.md#73-content-hash) and copy its session-level `content_hash` verbatim into segment N's header.
 - Recovered writers MAY emit `segment.prev_content_hash: null` when the previous segment is lost.
 
 #### Composition with multi-session files
 
-`session_uid` and `segment.*` sit at the **session-header** grain, not the file grain. A multi-session trail file (§9.6) MAY contain N session headers, each independently multi-segmentable. The trail envelope (§8) is unaffected.
+`session_uid` and `segment.*` sit at the **session-header** grain, not the file grain. A multi-session trail file ([§9.6](#96-multi-session-trail-files)) MAY contain N session headers, each independently multi-segmentable. The trail envelope ([§8](./08-the-trail-envelope.md#8-the-trail-envelope)) is unaffected.
 
 Within one file, two groups with the same `session_uid` SHOULD NOT claim the same normalized `segment.seq` value; a missing `segment` is equivalent to `seq: 1`. Duplicate pairs emit `duplicate_segment_seq` warnings. Groups for the same `session_uid` SHOULD appear in non-descending `segment.seq` order in file order; a descending sequence emits `out_of_order_segment_seq`.
 
@@ -208,29 +208,29 @@ group      := <one JSONL record with type:"session"> events*
 events     := zero or more event records (§10)
 ```
 
-The trail envelope (§8) remains optional even when N ≥ 2. When present with N ≥ 2 groups, the file-level `content_hash` on the envelope covers all N groups' already-stamped session hashes, applying the §7.4 two-pass procedure unchanged (every session hash stamped first; envelope hash stamped over the finalized record set). When absent, file-level identity defaults from §8.5 apply (no file-level `content_hash` is meaningful; only per-session hashes).
+The trail envelope ([§8](./08-the-trail-envelope.md#8-the-trail-envelope)) remains optional even when N ≥ 2. When present with N ≥ 2 groups, the file-level `content_hash` on the envelope covers all N groups' already-stamped session hashes, applying the [§7.4](./07-identity-artifacts-and-content-addressing.md#74-two-tier-identity) two-pass procedure unchanged (every session hash stamped first; envelope hash stamped over the finalized record set). When absent, file-level identity defaults from [§8.5](./08-the-trail-envelope.md#85-file-identity-defaults-when-envelope-is-absent) apply (no file-level `content_hash` is meaningful; only per-session hashes).
 
 #### 9.6.2 Group boundaries and reader-tolerant recovery
 
-Readers detect group boundaries by `type:"session"` alone. A record with `type:"session"` always opens a new group, regardless of `schema_version` value: this lets reader-tolerant parsers (§6) recover from a malformed mid-file header and continue parsing subsequent groups instead of treating the rest of the file as orphan events. The strict validator still errors on individual records that fail schema validation; recovery affects parsing structure, not per-record validity.
+Readers detect group boundaries by `type:"session"` alone. A record with `type:"session"` always opens a new group, regardless of `schema_version` value: this lets reader-tolerant parsers ([§6](./06-versioning.md#6-versioning)) recover from a malformed mid-file header and continue parsing subsequent groups instead of treating the rest of the file as orphan events. The strict validator still errors on individual records that fail schema validation; recovery affects parsing structure, not per-record validity.
 
 Entries that appear before the first `type:"session"` record (and after any envelope) are not part of any group and are always invalid: `events_before_first_session_header`.
 
 #### 9.6.3 Per-group validation
 
-Whole-file graph rules (§18) apply **within** a group, not across:
+Whole-file graph rules ([§18](./18-validation.md#18-validation)) apply **within** a group, not across:
 
 - `parent_id` resolution is scoped to the enclosing group. A `parent_id` that references an `id` in another group is treated as `unknown_parent_id` (cross-group references go through `fork_from`, not `parent_id`).
-- `tool_call` / `tool_result` pairing (§10.5) runs per group. An unmatched `tool_call` in group A is not satisfied by a `tool_result` in group B.
+- `tool_call` / `tool_result` pairing ([§10.5](./10-events.md#105-tool-call-terminal-pairing)) runs per group. An unmatched `tool_call` in group A is not satisfied by a `tool_result` in group B.
 - `session_end.payload.final_message_id`, `source.raw.envelope_ref`, `payload.usage` checks, and the `stream` consistency rule each run per group.
 
-Event `id` uniqueness (§7.5) remains **file-scoped**: every `id` (across every group's header and events) MUST be unique within the file.
+Event `id` uniqueness ([§7.5](./07-identity-artifacts-and-content-addressing.md#75-event-identifiers)) remains **file-scoped**: every `id` (across every group's header and events) MUST be unique within the file.
 
 #### 9.6.4 Per-group `content_hash`
 
-Each group's session-level `content_hash` is computed over the canonical bytes of that group's slice only (header + its events, envelope and sibling groups excluded). This is the same procedure as §7.3 / §7.4 applied to the slice. As a consequence, extracting one session from a multi-session file (drop the envelope, drop sibling groups, write only that group's canonical bytes) reproduces the same digest as the in-file value.
+Each group's session-level `content_hash` is computed over the canonical bytes of that group's slice only (header + its events, envelope and sibling groups excluded). This is the same procedure as [§7.3](./07-identity-artifacts-and-content-addressing.md#73-content-hash) / [§7.4](./07-identity-artifacts-and-content-addressing.md#74-two-tier-identity) applied to the slice. As a consequence, extracting one session from a multi-session file (drop the envelope, drop sibling groups, write only that group's canonical bytes) reproduces the same digest as the in-file value.
 
-When a reader extracts a single session from a multi-session file outside writer-strict validation and the recomputed `content_hash` does not match the value stored in the in-file header, it SHOULD emit a warning rather than an error. Strict validation of a finalized trail file still treats an in-place finalized `content_hash` mismatch as an error (§18.4).
+When a reader extracts a single session from a multi-session file outside writer-strict validation and the recomputed `content_hash` does not match the value stored in the in-file header, it SHOULD emit a warning rather than an error. Strict validation of a finalized trail file still treats an in-place finalized `content_hash` mismatch as an error ([§18.4](./18-validation.md#184-file-graph-checks)).
 
 #### 9.6.5 Cross-group references
 
@@ -246,14 +246,14 @@ The only sanctioned cross-group reference primitive is the session header's `for
 
 - Sessions in a file SHOULD appear in chronological order by header `ts`. Out-of-order placement emits `out_of_order_session_headers` (warning, not error).
 - Per-session `cwd` and `vcs` MAY diverge across sessions in the same file. Divergent `vcs.revision` across groups emits `vcs_revision_divergence` (warning, not error) — useful for spotting accidental cross-checkout bundling.
-- `schema_version` is carried on every session header. Sessions in the same file are independently versioned (reader-tolerant patch acceptance per §6 applies per-header).
+- `schema_version` is carried on every session header. Sessions in the same file are independently versioned (reader-tolerant patch acceptance per [§6](./06-versioning.md#6-versioning) applies per-header).
 - Empty groups (a header with zero events) are legal — they represent "session started, nothing happened."
 
 #### 9.6.7 Redaction of multi-session files
 
-Redacting a multi-session trail produces a multi-session redacted trail with the same group count in the same order, redacted in place. The redactor resets `content_hash` to `<pending>` on every session header (and on the envelope when present) before share/transport tooling re-stamps via the two-pass §7.4 procedure.
+Redacting a multi-session trail produces a multi-session redacted trail with the same group count in the same order, redacted in place. The redactor resets `content_hash` to `<pending>` on every session header (and on the envelope when present) before share/transport tooling re-stamps via the two-pass [§7.4](./07-identity-artifacts-and-content-addressing.md#74-two-tier-identity) procedure.
 
-When redaction changes bytes, lineage hashes that point to artifacts in the same redacted file MUST be rewritten to the target's redacted content hash, using the §7.4.1 hash tier. Header-level `fork_from.content_hash` is rewritten when `fork_from.session_id` names an in-file sibling. `segment.prev_content_hash` is rewritten when the previous `segment.seq` for the same `session_uid` is in the file. When the lineage target is not in the redacted file, redactors MUST drop `fork_from.content_hash` while keeping id references, and MUST set `segment.prev_content_hash` to `null` for an unverifiable previous segment. `redacted_from.content_hash` remains raw-artifact provenance: header-level `redacted_from.content_hash` links the redacted session to its raw counterpart; envelope-level `redacted_from.content_hash` links the redacted file to its raw counterpart.
+When redaction changes bytes, lineage hashes that point to artifacts in the same redacted file MUST be rewritten to the target's redacted content hash, using the [§7.4.1](./07-identity-artifacts-and-content-addressing.md#741-hash-tier-for-fork_from-and-redacted_from) hash tier. Header-level `fork_from.content_hash` is rewritten when `fork_from.session_id` names an in-file sibling. `segment.prev_content_hash` is rewritten when the previous `segment.seq` for the same `session_uid` is in the file. When the lineage target is not in the redacted file, redactors MUST drop `fork_from.content_hash` while keeping id references, and MUST set `segment.prev_content_hash` to `null` for an unverifiable previous segment. `redacted_from.content_hash` remains raw-artifact provenance: header-level `redacted_from.content_hash` links the redacted session to its raw counterpart; envelope-level `redacted_from.content_hash` links the redacted file to its raw counterpart.
 
 #### 9.6.8 No hard cap
 

@@ -21,8 +21,8 @@
 | **Redacted trail** | A separate artifact produced from a raw trail for sharing. It has its own `content_hash`. |
 | **Shared trail** | A redacted trail transported through a sharing mechanism. |
 | **Synthesized event** | An event the adapter constructed from indirect source data (e.g., a git diff), not mapped from a real source event. Flagged with `source.synthesized: true`. |
-| **Content hash** | SHA-256 of the exact artifact's canonical bytes (§7). |
-| **Canonical bytes** | The file content normalized per §7 for hashing. |
+| **Content hash** | SHA-256 of the exact artifact's canonical bytes ([§7](./07-identity-artifacts-and-content-addressing.md#7-identity-artifacts-and-content-addressing)). |
+| **Canonical bytes** | The file content normalized per [§7](./07-identity-artifacts-and-content-addressing.md#7-identity-artifacts-and-content-addressing) for hashing. |
 | **Source escape hatch** | The `source.raw` field; preserves verbatim source-format data for lossless round-trip. |
 
 ---

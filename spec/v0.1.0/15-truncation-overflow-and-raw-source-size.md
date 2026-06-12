@@ -42,9 +42,9 @@ Two placements are valid:
 
 Specific size thresholds, the algorithm a writer uses to choose which leaves to elide, and whether elision is gated by a hard cap are implementation policy — they belong in writer documentation, not the format. Validators MAY warn on entries whose `source.raw` exceeds an implementation-chosen size budget, but the wire format itself imposes no fixed limit.
 
-When elision happens at the first emission of a source envelope (§10.7), subsequent `envelope_ref` entries still resolve — the ref points at the elided entry's `id`, not at its inlined envelope.
+When elision happens at the first emission of a source envelope ([§10.7](./10-events.md#107-source-envelope-referencing)), subsequent `envelope_ref` entries still resolve — the ref points at the elided entry's `id`, not at its inlined envelope.
 
-Adapters MUST redact known secret patterns in `source.raw` before writing — emission-time redaction is a writer responsibility, not a share-time concern. Validators emit `source_raw_unredacted_secret` (warning) when a string leaf in `source.raw` matches a known credential pattern (Authorization headers, Bearer tokens, JWT, vendor API keys, PEM private key blocks, ENV-style assignments). Share-time redaction (§16) layers additional normalization on top — paths, PII — and produces a separate artifact.
+Adapters MUST redact known secret patterns in `source.raw` before writing — emission-time redaction is a writer responsibility, not a share-time concern. Validators emit `source_raw_unredacted_secret` (warning) when a string leaf in `source.raw` matches a known credential pattern (Authorization headers, Bearer tokens, JWT, vendor API keys, PEM private key blocks, ENV-style assignments). Share-time redaction ([§16](./16-redaction.md#16-redaction)) layers additional normalization on top — paths, PII — and produces a separate artifact.
 
 ---
 

@@ -1,6 +1,6 @@
 ## Appendix B — Content hash worked example
 
-This example shows the §7.3 two-pass procedure for the
+This example shows the [§7.3](./07-identity-artifacts-and-content-addressing.md#73-content-hash) two-pass procedure for the
 `hash-vectors/minimal-pending-roundtrip.trail.jsonl` conformance fixture. The
 remaining canonicalization and two-tier identity cases are published in the
 `hash-vectors/` fixture category.

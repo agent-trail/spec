@@ -1,6 +1,6 @@
 ## 12. Vendor extensions
 
-Implementations and vendors can add custom data via the `meta` field on the trail envelope, session header, or any event entry. Use the `x-<vendor>/<name>` extension grammar (§12.1) for keys to avoid collisions:
+Implementations and vendors can add custom data via the `meta` field on the trail envelope, session header, or any event entry. Use the `x-<vendor>/<name>` extension grammar ([§12.1](#121-extension-grammar)) for keys to avoid collisions:
 
 ```jsonc
 "meta": {
@@ -12,7 +12,7 @@ Implementations and vendors can add custom data via the `meta` field on the trai
 
 Readers MAY preserve, ignore, or render `meta` fields. They MUST NOT abort on unknown keys.
 
-`entry.meta.redaction_count` is a standard optional non-negative integer convention for redacted artifacts. It counts how many redactor mutations were applied to that entry; see §16.
+`entry.meta.redaction_count` is a standard optional non-negative integer convention for redacted artifacts. It counts how many redactor mutations were applied to that entry; see [§16](./16-redaction.md#16-redaction).
 
 The `meta` field is for fields outside the canonical vocabulary. For verbatim source-event preservation, use `source.raw` ([§15.1](./15-truncation-overflow-and-raw-source-size.md#151-sourceraw-elision-and-redaction)) instead. See [§8.3](./08-the-trail-envelope.md#83-the-meta-extension-convention) for the full convention.
 

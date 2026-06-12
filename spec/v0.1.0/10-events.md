@@ -31,14 +31,14 @@ Every event entry has this base shape:
 
 | Field | Required | Type | Notes |
 |---|---|---|---|
-| `type` | yes | string | event type; see §10.2-10.3 |
-| `id` | yes | string | globally unique; ULID or UUID per §19 |
+| `type` | yes | string | event type; see [§10.2](#102-mandatory-event-types)-10.3 |
+| `id` | yes | string | globally unique; ULID or UUID per [§19](./19-formal-schema.md#19-formal-schema) |
 | `parent_id` | no | string | references another `id` for tree topology; absent = linear file order |
 | `ts` | yes | string | ISO-8601 timestamp |
 | `payload` | yes | object | type-specific data |
 | `semantic` | no | object | linking metadata for fallback pairing |
 | `source` | no | object | adapter-provided source metadata |
-| `meta` | no | object | vendor extensions (§8.3 / §12) |
+| `meta` | no | object | vendor extensions ([§8.3](./08-the-trail-envelope.md#83-the-meta-extension-convention) / [§12](./12-vendor-extensions.md#12-vendor-extensions)) |
 
 ### 10.2 Mandatory event types
 
@@ -140,7 +140,7 @@ Model identification for downstream cost analysis uses `payload.model` first, fa
 
 When a single source envelope fans out to multiple entries (text blocks, tool calls, thinking blocks sharing one API response), `usage` accounts for the whole envelope. Writers MUST attach it to the first derived entry whose payload supports `usage`, skip non-usage-capable derived entries, and MUST NOT repeat it on later derived entries. In v0.1.0, `usage` is valid on `agent_message`, `agent_thinking`, and `tool_call` payloads; if an envelope emits none of those entries, canonical `usage` is omitted.
 
-Monetary cost is intentionally not a canonical trail field or event. Analyzers compute cost from token usage, model identification, and their own pricing tables, and carry pricing provenance such as currency, pricing source, and effective date in analyzer output. If a source exposes a billing estimate, writers MAY preserve it as opaque source data under `x-<vendor>/<name>` keys on the entry's `meta` field (§8.3). Latency and wall-clock telemetry are deferred to a future minor version; sources rarely expose them consistently.
+Monetary cost is intentionally not a canonical trail field or event. Analyzers compute cost from token usage, model identification, and their own pricing tables, and carry pricing provenance such as currency, pricing source, and effective date in analyzer output. If a source exposes a billing estimate, writers MAY preserve it as opaque source data under `x-<vendor>/<name>` keys on the entry's `meta` field ([§8.3](./08-the-trail-envelope.md#83-the-meta-extension-convention)). Latency and wall-clock telemetry are deferred to a future minor version; sources rarely expose them consistently.
 
 #### `task_plan_update`
 
@@ -343,7 +343,7 @@ top-level `exit_code` on `tool_result`, because the concept does not apply to ki
 or `web_fetch`.
 
 Privacy: `meta` carries the same raw content as `output` (shell stdout, MCP block text), so the
-redaction pipeline scrubs `meta` string leaves alongside `output` (§16).
+redaction pipeline scrubs `meta` string leaves alongside `output` ([§16](./16-redaction.md#16-redaction)).
 
 #### `user_query`
 
@@ -470,7 +470,7 @@ Post-creation update to logical session metadata. The session header carries the
 | Payload field | Required | Type | Notes |
 |---|---|---|---|
 | `field` | yes | enum or extension | One of `name`, `description`, `tags`, `agent.model_default`, `vcs.branch`, `vcs.worktree`, or `x-<vendor>/<name>`. |
-| `value` | yes | field-specific | Replacement value. Must match the field type: string for `name`/`description`/`agent.model_default`/`vcs.branch`, string array for `tags`, and the §9.2 worktree shape for `vcs.worktree`. Extension fields MAY carry any JSON value. |
+| `value` | yes | field-specific | Replacement value. Must match the field type: string for `name`/`description`/`agent.model_default`/`vcs.branch`, string array for `tags`, and the [§9.2](./09-the-session-header.md#92-fields) worktree shape for `vcs.worktree`. Extension fields MAY carry any JSON value. |
 | `previous_value` | no | field-specific | Prior value when the adapter knows it. Same type as `value`. |
 | `reason` | yes | enum or extension | `ai_generated`, `user_set`, `runtime_inferred`, `external`, or `x-<vendor>/<name>`. |
 
@@ -526,7 +526,7 @@ A meaningful source timeline record that is not a user message, agent message, t
 | `context_injected` | Runtime injected standalone context that SHOULD remain visible outside a `user_message`. | `{ source_kind, name?, size_bytes? }` |
 | `hook_progress` | Catch-all for source-emitted progress/hook/queue records that do not map to a more specific reserved lifecycle kind. Adapters SHOULD prefer `session_start` / `turn_end` / `pre_tool_use` / `post_tool_use` / `subagent_end` / `hook_fired` when the source signal is unambiguous, and fall back to `hook_progress` only for unrecognised progress streams. | `{ hook_event?, hook_name?, ... }` |
 | `queue_operation` | Source recorded an enqueue or dequeue operation. | Free-form. |
-| `heartbeat` | Periodic liveness ping during streaming capture (§9.4). Optional. Non-normative; readers MAY treat as informational. | `{ interval_ms? }` |
+| `heartbeat` | Periodic liveness ping during streaming capture ([§9.4](./09-the-session-header.md#94-streaming-and-live-capture)). Optional. Non-normative; readers MAY treat as informational. | `{ interval_ms? }` |
 | `vcs_commit` | Adapter detected a VCS commit created during the session. | `{ sha, tool_call_id, branch?, message?, repo? }` |
 
 Use `tool_call_aborted{scope:"turn"}` for stops in a tool-invocation context where no specific call is identifiable. Use `system_event.kind:"turn_aborted"` for model/system-level turn stops with no tool in flight.
@@ -565,7 +565,7 @@ Cross-agent diagnostic signals. Adapters MAY emit these to surface non-fatal err
 - Anything else MUST use `x-<vendor>/<name>` form, e.g. `x-claudecode/notification`.
 - Readers are tolerant of unknown `x-*` kinds — they pass through with no diagnostic.
 - Bare unknown strings (no `x-` prefix, not in the reserved set) are rejected by writer-strict validation.
-- Adapters quarantining an unparseable source record MUST emit `system_event` with `kind:"x-<vendor>/unknown_record"` and preserve the record in `source.raw`; `parse_fidelity.quarantined_count` counts this pattern (§9.2).
+- Adapters quarantining an unparseable source record MUST emit `system_event` with `kind:"x-<vendor>/unknown_record"` and preserve the record in `source.raw`; `parse_fidelity.quarantined_count` counts this pattern ([§9.2](./09-the-session-header.md#92-fields)).
 - If an `x-*` kind proves cross-agent, promote it to the reserved enum in a minor format version bump. Document emitted kinds per adapter in `docs/parser-source-matrix.md`.
 
 #### `capability_change`
@@ -846,7 +846,7 @@ Synthesized instances MUST set `source.synthesized: true`.
 
 #### `session_end`
 
-Clean terminal marker. Distinct from `session_terminated` (abnormal). Optional; many writers won't emit it. When present at EOF, signals a normal conclusion of the session and suppresses the "unmatched tool calls at EOF" warning of §18.4.
+Clean terminal marker. Distinct from `session_terminated` (abnormal). Optional; many writers won't emit it. When present at EOF, signals a normal conclusion of the session and suppresses the "unmatched tool calls at EOF" warning of [§18.4](./18-validation.md#184-file-graph-checks).
 
 ```jsonc
 {
@@ -889,7 +889,7 @@ When `tool_result.payload.for_id` is null, missing, or refers to a non-existent 
 
 Writers SHOULD avoid relying on fallbacks. Populate `for_id` when reliable; use `semantic.call_id` when the source's native ID doesn't map cleanly to event `id`. Do not use semantic or sequential fallback pairing for `tool_call_aborted`; if a source cannot identify the call, emit `scope:"turn"` without `for_id`.
 
-Validators apply the deterministic pairing rules when computing the "unmatched `tool_call` at EOF" warning (§18.4): explicit `for_id` references from `tool_result` and call-scoped `tool_call_aborted` first, then fallback rules 1 and 2 above for `tool_result` only (semantic match, branch-scoped sequential match). The heuristic rule (3) is reader-only — it produces uncertain pairings that readers MUST flag in rendered output, so validators do not apply it. A `tool_call` is considered matched when one of these deterministic methods pairs it with a `tool_result` or call-scoped `tool_call_aborted`.
+Validators apply the deterministic pairing rules when computing the "unmatched `tool_call` at EOF" warning ([§18.4](./18-validation.md#184-file-graph-checks)): explicit `for_id` references from `tool_result` and call-scoped `tool_call_aborted` first, then fallback rules 1 and 2 above for `tool_result` only (semantic match, branch-scoped sequential match). The heuristic rule (3) is reader-only — it produces uncertain pairings that readers MUST flag in rendered output, so validators do not apply it. A `tool_call` is considered matched when one of these deterministic methods pairs it with a `tool_result` or call-scoped `tool_call_aborted`.
 
 > Non-normative diagram.
 
@@ -930,7 +930,7 @@ When a single source envelope produces multiple entries — for example, an assi
 - The **first** entry derived from a given source envelope sets `source.raw.envelope` (and `source.raw.block`, `source.raw.block_index` if applicable).
 - **Subsequent** entries derived from the same envelope set `source.raw.envelope_ref` to the first entry's `id`. They omit `source.raw.envelope` and keep `block` / `block_index`.
 
-`source.raw.envelope_ref` is an optional string. Writers MUST ensure it references the `id` of an entry that appears **earlier** in the same file — the same envelope, inlined once. Forward references and dangling references are reader errors (`source_raw_envelope_ref_unresolved`, §18.4). The first-inline-then-ref shape is streaming-write friendly: readers resolve refs in a single pass without backtracking.
+`source.raw.envelope_ref` is an optional string. Writers MUST ensure it references the `id` of an entry that appears **earlier** in the same file — the same envelope, inlined once. Forward references and dangling references are reader errors (`source_raw_envelope_ref_unresolved`, [§18.4](./18-validation.md#184-file-graph-checks)). The first-inline-then-ref shape is streaming-write friendly: readers resolve refs in a single pass without backtracking.
 
 This mechanism is additive over v0.1.0. Readers that do not understand `envelope_ref` will see it as an unknown raw-source field and ignore it; the entry's other fields (`type`, `payload`, `semantic`) remain fully self-describing.
 

@@ -9,7 +9,7 @@ Share-time redactors MUST apply the privacy rules below before producing shared 
 | Field or value | Share-time action |
 |---|---|
 | `cwd` | Normalize or strip. |
-| `vcs.remote_url` | Strip or normalize per §9.2 unless the user explicitly opts in. |
+| `vcs.remote_url` | Strip or normalize per [§9.2](./09-the-session-header.md#92-fields) unless the user explicitly opts in. |
 | `system_event.payload.data.repo` for `vcs_commit` | Treat like `vcs.remote_url`; strip or normalize unless the user explicitly opts in. |
 | `vcs.worktree.path`, `vcs.worktree.original_cwd` | Normalize or strip. |
 | `source.path` | Normalize or strip. |
@@ -23,7 +23,7 @@ If a resolved response contains answer keys that do not appear on the referenced
 
 Share-time redactors SHOULD populate `entry.meta.redaction_count` on each changed event entry. The count is a non-negative integer equal to the number of redactor mutations applied to that entry. Existing numeric `redaction_count` values are additive when a redacted trail is redacted again; unchanged entries keep their existing value.
 
-When redaction changes bytes, lineage hashes are updated as described in §9.6.7. This prevents redacted session bundles and redacted segment chains from retaining raw-artifact hashes that can no longer verify against the shared redacted bytes.
+When redaction changes bytes, lineage hashes are updated as described in [§9.6.7](./09-the-session-header.md#967-redaction-of-multi-session-files). This prevents redacted session bundles and redacted segment chains from retaining raw-artifact hashes that can no longer verify against the shared redacted bytes.
 
 > Non-normative diagram.
 
