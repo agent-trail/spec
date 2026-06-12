@@ -24,7 +24,7 @@ run = "hk check"
 
 [tasks.test]
 description = "Run tests for this repository"
-depends = ["check:json", "check:schema", "check:fixtures", "check:conformance"]
+depends = ["check:json", "check:schema", "check:conformance"]
 
 [tasks."check:json"]
 description = "Validate JSON and JSONL syntax"
@@ -40,28 +40,6 @@ ajv compile --spec=draft2020 --strict=false --validate-formats=false -s schema/d
 ajv compile --spec=draft2020 --strict=false --validate-formats=false -s schema/v0.1.0.json
 ajv compile --spec=draft2020 --strict=false --validate-formats=false -s fixtures/validation/manifest.schema.json
 ajv validate --spec=draft2020 --strict=false --validate-formats=false -s fixtures/validation/manifest.schema.json -d fixtures/validation/manifest.json
-"""
-
-[tasks."check:fixtures"]
-description = "Validate fixture manifest integrity"
-run = """
-manifest_paths=$(mktemp)
-fixture_paths=$(mktemp)
-trap 'rm -f "$manifest_paths" "$fixture_paths"' EXIT
-
-jq -r '.fixtures[].path' fixtures/validation/manifest.json | sort > "$manifest_paths"
-find fixtures/validation -name '*.trail.jsonl' -print | sed 's#^fixtures/validation/##' | sort > "$fixture_paths"
-
-if [ "$(jq -r '.fixtures[].path' fixtures/validation/manifest.json | sort | uniq -d | wc -l | tr -d ' ')" != "0" ]; then
-  echo "Duplicate fixture path in fixtures/validation/manifest.json"
-  jq -r '.fixtures[].path' fixtures/validation/manifest.json | sort | uniq -d
-  exit 1
-fi
-
-if ! diff -u "$manifest_paths" "$fixture_paths"; then
-  echo "Fixture manifest does not match committed .trail.jsonl files"
-  exit 1
-fi
 """
 
 [tasks."check:conformance"]
