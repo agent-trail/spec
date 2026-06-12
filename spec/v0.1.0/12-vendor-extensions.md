@@ -14,7 +14,7 @@ Readers MAY preserve, ignore, or render `meta` fields. They MUST NOT abort on un
 
 `entry.meta.redaction_count` is a standard optional non-negative integer convention for redacted artifacts. It counts how many redactor mutations were applied to that entry; see §16.
 
-The `meta` field is for fields outside the canonical vocabulary. For verbatim source-event preservation, use `source.raw` ([§15.1](#15-1-source-raw-elision-and-redaction)) instead. See [§8.3](#8-3-the-meta-extension-convention) for the full convention.
+The `meta` field is for fields outside the canonical vocabulary. For verbatim source-event preservation, use `source.raw` ([§15.1](./15-truncation-overflow-and-raw-source-size.md#151-sourceraw-elision-and-redaction)) instead. See [§8.3](./08-the-trail-envelope.md#83-the-meta-extension-convention) for the full convention.
 
 ### 12.1 Extension grammar
 

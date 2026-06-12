@@ -57,7 +57,7 @@ The envelope MUST NOT carry a `parent_id`. It is not part of the event graph.
 
 The trail envelope (§8), the session header (§9), and every event entry (§10.1) accept an optional `meta` object for vendor extensions, modelled on OCI image annotations and Kubernetes `metadata.annotations`. Object-typed values are allowed so nested data fits naturally. Keys SHOULD use the `x-<vendor>/<name>` extension grammar (§12.1) to avoid collisions (`x-example/team`, `x-acme/build_id`, `x-entire/checkpoint_id`). The validator treats `meta` as opaque; it contributes to whichever `content_hash` tier covers its host record (§7.4): `meta` on the session header or any event entry feeds the session-level hash, and `meta` on the trail envelope feeds the file-level hash.
 
-For verbatim source-event preservation, use `source.raw` ([§10.1](#10-1-base-shape), [§10.7](#10-7-source-envelope-referencing), [§15.1](#15-1-source-raw-elision-and-redaction)) instead — `meta` is for cross-cutting annotations, not for capturing the source envelope.
+For verbatim source-event preservation, use `source.raw` ([§10.1](./10-events.md#101-base-shape), [§10.7](./10-events.md#107-source-envelope-referencing), [§15.1](./15-truncation-overflow-and-raw-source-size.md#151-sourceraw-elision-and-redaction)) instead — `meta` is for cross-cutting annotations, not for capturing the source envelope.
 
 This draft defines one standard event-entry `meta` key: `redaction_count` (§16). Other standard keys MAY be promoted in later minor bumps based on observed usage.
 

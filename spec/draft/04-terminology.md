@@ -16,7 +16,7 @@
 | **Adapter** | Software that reads a source agent's storage and emits a trail file. |
 | **Linear session** | A session whose events do not use `parent_id`. Events are ordered by file position. |
 | **Tree session** | A session where some events use `parent_id` to form a DAG. |
-| **Canonical event** | One of the mandatory or optional event types in [§10.2](#10-2-mandatory-event-types) and [§10.3](#10-3-optional-event-types). |
+| **Canonical event** | One of the mandatory or optional event types in [§10.2](./10-events.md#102-mandatory-event-types) and [§10.3](./10-events.md#103-optional-event-types). |
 | **Raw trail** | A local artifact preserving source fidelity as much as possible. |
 | **Redacted trail** | A separate artifact produced from a raw trail for sharing. It has its own `content_hash`. |
 | **Shared trail** | A redacted trail transported through a sharing mechanism. |

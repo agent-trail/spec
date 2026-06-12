@@ -21,7 +21,7 @@ The `tool_call.payload.tool` field uses these values. Each defines the expected 
 | `subagent_invoke` | `{ task, agent_type?, session_id? }` |
 | `other` | `{ name, args? }` |
 
-Checklist and plan snapshots use `task_plan_update` ([§10.2](#10-2-mandatory-event-types)) rather than `tool_call`.
+Checklist and plan snapshots use `task_plan_update` ([§10.2](./10-events.md#102-mandatory-event-types)) rather than `tool_call`.
 
 ### 11.1 `file_edit`
 

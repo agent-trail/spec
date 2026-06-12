@@ -16,7 +16,7 @@ Redaction reduces content exposure but does not make a shared trail private. Tim
 
 Header fields need the same privacy review as event payloads. `cwd`, `vcs.remote_url`, `vcs.worktree`, `name`, `description`, and `tags` commonly contain usernames, internal hostnames, private repository names, or project identifiers. Sharing tools SHOULD scan headers and trail envelopes as well as event payloads (§16).
 
-The implementation-maintained detector catalog and rule pack schema live in [`docs/redaction-patterns.md`](./docs/redaction-patterns.md); this catalog is non-normative and does not change the trail file format.
+The implementation-maintained detector catalog and rule pack schema live in `docs/redaction-patterns.md`; this catalog is non-normative and does not change the trail file format.
 
 ---
 

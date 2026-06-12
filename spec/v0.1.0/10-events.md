@@ -203,7 +203,7 @@ When the upstream source does not provide item ids, or provides empty or whitesp
 
 #### `tool_call`
 
-The agent invoked a tool. Tool kinds use the taxonomy in [§11](#11-canonical-tool-taxonomy).
+The agent invoked a tool. Tool kinds use the taxonomy in [§11](./11-canonical-tool-taxonomy.md#11-canonical-tool-taxonomy).
 
 ```jsonc
 {
@@ -225,7 +225,7 @@ The agent invoked a tool. Tool kinds use the taxonomy in [§11](#11-canonical-to
 
 | Payload field | Required | Type | Notes |
 |---|---|---|---|
-| `tool` | yes | string | canonical tool kind ([§11](#11-canonical-tool-taxonomy)) |
+| `tool` | yes | string | canonical tool kind ([§11](./11-canonical-tool-taxonomy.md#11-canonical-tool-taxonomy)) |
 | `args` | yes | object | tool-specific args |
 | `truncated` | no | boolean | true when `args` is a bounded excerpt rather than complete tool arguments |
 | `args_size` | conditional | integer | original serialized argument byte size; REQUIRED when `truncated: true` |
@@ -234,7 +234,7 @@ The agent invoked a tool. Tool kinds use the taxonomy in [§11](#11-canonical-to
 
 #### `tool_result`
 
-The result of a `tool_call`. References the call via `for_id`. Writers omit `for_id` when the source does not provide a reliable match. Readers MAY tolerate legacy/null values; when `for_id` is null or missing, see [§10.5](#10-5-tool-call-terminal-pairing).
+The result of a `tool_call`. References the call via `for_id`. Writers omit `for_id` when the source does not provide a reliable match. Readers MAY tolerate legacy/null values; when `for_id` is null or missing, see [§10.5](#105-tool-call-terminal-pairing).
 
 ```jsonc
 {
@@ -301,7 +301,7 @@ Bare unknown `scope` and `reason` values are writer-strict errors. Readers are t
 ##### `tool_result.payload.meta` — structured outputs
 
 `output` is a display string. When the source tool returned structured data, writers MAY also
-populate `meta`, an object keyed by the originating `tool_call.tool` (the canonical tool kind, [§11](#11-canonical-tool-taxonomy)).
+populate `meta`, an object keyed by the originating `tool_call.tool` (the canonical tool kind, [§11](./11-canonical-tool-taxonomy.md#11-canonical-tool-taxonomy)).
 Consumers that understand a kind read `meta.<toolKind>`; everyone else falls back to `output`. `meta`
 is optional and additive — existing writers that emit only `output` stay valid.
 
@@ -495,7 +495,7 @@ A meaningful source timeline record that is not a user message, agent message, t
 
 `kind` is REQUIRED and writer-strict. It MUST be either one of the reserved cross-agent values below, or a vendor-namespaced extension of the form `x-<vendor>/<name>`. Bare unknown strings are rejected by writer-strict validation. Readers are tolerant of unknown `x-*` kinds and pass them through. `data` is curated structured metadata for rendering and search, not a replacement for `source.raw`.
 
-`context_compact`, `user_interrupt`, `model_change`, `mode_change`, `thinking_level_change`, and `session_end` are first-class record types ([§10.3](#10-3-optional-event-types)). Do not duplicate them under `system_event.kind`.
+`context_compact`, `user_interrupt`, `model_change`, `mode_change`, `thinking_level_change`, and `session_end` are first-class record types ([§10.3](./10-events.md#103-optional-event-types)). Do not duplicate them under `system_event.kind`.
 
 ##### Reserved lifecycle vocabulary
 
@@ -921,7 +921,7 @@ Readers MUST tolerate unknown types:
 - Render with a generic fallback.
 - Do not abort parsing.
 
-Writers MUST NOT invent new top-level event types in v0.1 writer-strict output. Use the `other` tool kind ([§11](#11-canonical-tool-taxonomy)) or `source.raw` ([§10.1](#10-1-base-shape), [§15.1](#15-1-source-raw-elision-and-redaction)) for adapter-specific data, or `meta` ([§8.3](#8-3-the-meta-extension-convention) / [§12](#12-vendor-extensions)) for vendor extensions. Reader-tolerant parsing MAY preserve unknown future event types at runtime; this tolerance is not part of the writer schema.
+Writers MUST NOT invent new top-level event types in v0.1 writer-strict output. Use the `other` tool kind ([§11](./11-canonical-tool-taxonomy.md#11-canonical-tool-taxonomy)) or `source.raw` ([§10.1](./10-events.md#101-base-shape), [§15.1](./15-truncation-overflow-and-raw-source-size.md#151-sourceraw-elision-and-redaction)) for adapter-specific data, or `meta` ([§8.3](./08-the-trail-envelope.md#83-the-meta-extension-convention) / [§12](./12-vendor-extensions.md#12-vendor-extensions)) for vendor extensions. Reader-tolerant parsing MAY preserve unknown future event types at runtime; this tolerance is not part of the writer schema.
 
 ### 10.7 Source envelope referencing
 
