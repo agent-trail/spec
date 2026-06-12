@@ -12,6 +12,8 @@ This repository contains the Agent Trail specification, JSON Schema artifacts, f
 - [`schema/v0.1.0.json`](./schema/v0.1.0.json) - frozen v0.1.0 JSON Schema artifact.
 - [`schema/draft.json`](./schema/draft.json) - current draft JSON Schema artifact.
 - [`fixtures/validation/`](./fixtures/validation/) - validation conformance fixture corpus and manifest.
+- [`docs/GLOSSARY.md`](./docs/GLOSSARY.md) - shared terminology for public format discussions.
+- [`docs/adr/`](./docs/adr/) - format ADRs carried forward for the spec repo.
 
 ## Related Repositories
 
