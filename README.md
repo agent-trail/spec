@@ -1,2 +1,12 @@
 # spec
 Agent Trail format specification, schema artifacts, fixtures, and format ADRs.
+
+## Development
+
+```sh
+mise install
+mise run hooks:install
+mise run check
+```
+
+See `CONTRIBUTING.md` for workflow and PR expectations.
