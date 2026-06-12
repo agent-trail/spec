@@ -1,0 +1,25 @@
+## 20. Examples
+
+More complete examples are maintained as validated conformance fixtures under `tests/fixtures/validation/valid/spec-example-*.trail.jsonl` and published with concrete package exports such as `@agent-trail/schema/conformance/manifest.json` and `@agent-trail/schema/conformance/fixtures/valid/spec-example-*.trail.jsonl`. This keeps examples executable without splitting normative meaning away from the schema and validation rules.
+
+> Non-normative example index.
+
+Use these fixture-backed examples for larger scenarios:
+
+- `fixtures/validation/valid/spec-example-incomplete-session.trail.jsonl`
+- `fixtures/validation/valid/spec-example-mcp-call.trail.jsonl`
+- `fixtures/validation/valid/spec-example-synthesized-event.trail.jsonl`
+- `fixtures/validation/valid/spec-example-tool-call-semantic-pairing.trail.jsonl`
+- `fixtures/validation/valid/spec-example-tool-result-fallback-pairing.trail.jsonl`
+- `fixtures/validation/valid/spec-example-tree-abandoned-branch.trail.jsonl`
+
+Minimal at-a-glance trail:
+
+```jsonl
+{"type":"session","schema_version":"0.1.0","id":"01HSESS0000000000000000001","session_uid":"01HZZZZZZZZZZZZZZZZZZZZZ01","ts":"2026-05-17T14:00:00.000Z","agent":{"name":"codex-cli"}}
+{"type":"user_message","id":"01HEVTA0000000000000000001","ts":"2026-05-17T14:00:05.000Z","payload":{"text":"hello"}}
+{"type":"agent_message","id":"01HEVTA0000000000000000002","ts":"2026-05-17T14:00:07.000Z","payload":{"text":"hi"}}
+```
+
+---
+
