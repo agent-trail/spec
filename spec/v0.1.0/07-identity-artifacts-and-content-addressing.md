@@ -47,6 +47,21 @@ When a trail envelope is present, the file carries two independent content hashe
 
 Writers that emit both hashes MUST stamp every session-level hash first, then compute and stamp the file-level hash. Readers verify them independently. Different consumers care about different scopes: extraction tools recompute the session hash; share/transport tools verify the file hash.
 
+> Non-normative diagram.
+
+```mermaid
+flowchart TD
+  A["Session header + events"] --> B["Set session content_hash to <pending>"]
+  B --> C["Canonicalize session bytes (§7.3)"]
+  C --> D["Stamp session-level hash"]
+  D --> E{"Trail envelope present?"}
+  E -->|"no"| F["Finalized session artifact"]
+  E -->|"yes"| G["Envelope + stamped session groups"]
+  G --> H["Set envelope content_hash to <pending>"]
+  H --> I["Canonicalize whole file (§7.4)"]
+  I --> J["Stamp file-level hash"]
+```
+
 #### 7.4.1 Hash tier for `fork_from` and `redacted_from`
 
 Lineage references mirror the tier of the linking context:

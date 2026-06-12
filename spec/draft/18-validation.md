@@ -104,6 +104,19 @@ The suite manifest uses three assertion tiers:
 - Line-only assertions for schema-layer failures, because JSON Schema validator keyword vocabularies are implementation-specific.
 - Class tags (`classes`) marking which conformance classes each fixture applies to. Validation fixtures use `W`, `R1`, and `R2`; R0 renderer conformance needs a separate rendering suite.
 
+> Non-normative diagram.
+
+```mermaid
+flowchart TD
+  A["JSONL records"] --> B["Writer schema (§18.1)"]
+  B --> C["Whole-file graph checks (§18.4)"]
+  C --> D["Content hash verification (§7)"]
+  D --> E["Conformance fixture assertions"]
+  B --> F["Schema diagnostics"]
+  C --> G["Structural diagnostics"]
+  D --> H["Hash diagnostics"]
+```
+
 ### 18.4 File graph checks
 
 A v0.1.0-compliant trail file MUST also pass whole-file checks.

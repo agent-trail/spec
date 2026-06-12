@@ -30,5 +30,20 @@ Every valid trail file has:
 
 When the file contains exactly one group, behaviour is unchanged from earlier drafts. Multi-group ("multi-session") files are described in §9.6.
 
+> Non-normative diagram.
+
+```mermaid
+flowchart TD
+  A["Start of file"] --> B{"First record type"}
+  B -->|"trail"| C["Trail envelope (§8)"]
+  C --> D["Session header (§9)"]
+  B -->|"session"| D
+  D --> E["Events (§10)"]
+  E --> F{"Next record"}
+  F -->|"event"| E
+  F -->|"session"| D
+  F -->|"EOF"| G["End of file"]
+```
+
 ---
 

@@ -891,6 +891,28 @@ Writers SHOULD avoid relying on fallbacks. Populate `for_id` when reliable; use 
 
 Validators apply the deterministic pairing rules when computing the "unmatched `tool_call` at EOF" warning (§18.4): explicit `for_id` references from `tool_result` and call-scoped `tool_call_aborted` first, then fallback rules 1 and 2 above for `tool_result` only (semantic match, branch-scoped sequential match). The heuristic rule (3) is reader-only — it produces uncertain pairings that readers MUST flag in rendered output, so validators do not apply it. A `tool_call` is considered matched when one of these deterministic methods pairs it with a `tool_result` or call-scoped `tool_call_aborted`.
 
+> Non-normative diagram.
+
+```mermaid
+flowchart TD
+  A["tool_call"] --> B{"Terminal event"}
+  B -->|"tool_result.payload.for_id matches"| C["Matched explicitly"]
+  B -->|"tool_call_aborted scope=tool_call and for_id matches"| C
+  B -->|"matching semantic.call_id"| D["Matched by semantic fallback"]
+  B -->|"nearest unmatched prior call in same branch"| E["Matched by sequential fallback"]
+  B -->|"no deterministic match"| F["Unmatched at EOF warning (§18.4)"]
+```
+
+> Non-normative example.
+
+Derived from `fixtures/validation/valid/tool-call-matched-by-for-id.trail.jsonl`.
+
+```jsonl
+{"type":"session","schema_version":"0.1.0","id":"01HSESS0000000000000000001","session_uid":"01HZZZZZZZZZZZZZZZZZZZZZ01","ts":"2026-05-17T14:00:00.000Z","agent":{"name":"codex-cli"}}
+{"type":"tool_call","id":"01HEVTA0000000000000000001","ts":"2026-05-17T14:00:05.000Z","payload":{"tool":"file_read","args":{"path":"a.txt"}}}
+{"type":"tool_result","id":"01HEVTA0000000000000000002","ts":"2026-05-17T14:00:06.000Z","payload":{"for_id":"01HEVTA0000000000000000001","ok":true,"output":"hi"}}
+```
+
 ### 10.6 Unknown event types
 
 Readers MUST tolerate unknown types:

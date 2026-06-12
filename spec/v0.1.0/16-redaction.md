@@ -25,6 +25,16 @@ Share-time redactors SHOULD populate `entry.meta.redaction_count` on each change
 
 When redaction changes bytes, lineage hashes are updated as described in §9.6.7. This prevents redacted session bundles and redacted segment chains from retaining raw-artifact hashes that can no longer verify against the shared redacted bytes.
 
+> Non-normative diagram.
+
+```mermaid
+flowchart LR
+  A["Raw trail"] -->|"share-time redaction"| B["Redacted trail"]
+  B -->|"transport"| C["Shared trail"]
+  A -.->|"redacted_from.content_hash"| B
+  B -->|"new content_hash"| D["Independent artifact identity (§7)"]
+```
+
 Specific secret patterns, exact PII detectors, path-normalization strings, image preview behavior, token-usage policy, blob upload mechanics, and share workflow remain implementation semantics.
 
 ---

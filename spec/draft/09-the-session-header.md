@@ -184,6 +184,21 @@ A trail file MAY contain one OR more `(session header, events*)` groups concaten
 
 A multi-session trail is a session bundle: a forest of session groups. Each group MAY be linear or tree-native. Branches represented inside one source session use `parent_id` within that group; separate spawned or forked transcripts use separate groups linked by `header.fork_from`.
 
+> Non-normative diagram.
+
+```mermaid
+flowchart TD
+  A["Trail file"] --> B["Session group A"]
+  A --> C["Session group B"]
+  B --> D["Header A (§9)"]
+  B --> E["Events A (§10)"]
+  C --> F["Header B (§9)"]
+  C --> G["Events B (§10)"]
+  F -->|"fork_from.session_id"| D
+  E -->|"parent_id stays inside group"| E
+  G -->|"parent_id stays inside group"| G
+```
+
 #### 9.6.1 File grammar
 
 ```text
