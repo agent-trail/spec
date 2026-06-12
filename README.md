@@ -4,8 +4,7 @@ Agent Trail format specification, schema artifacts, fixtures, and format ADRs.
 ## Development
 
 ```sh
-mise install
-mise run hooks:install
+mise run setup
 mise run check
 ```
 
