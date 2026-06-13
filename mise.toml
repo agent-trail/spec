@@ -40,6 +40,7 @@ ajv compile --spec=draft2020 --strict=false --validate-formats=false -s schema/d
 ajv compile --spec=draft2020 --strict=false --validate-formats=false -s schema/v0.1.0.json
 ajv compile --spec=draft2020 --strict=false --validate-formats=false -s fixtures/validation/manifest.schema.json
 ajv validate --spec=draft2020 --strict=false --validate-formats=false -s fixtures/validation/manifest.schema.json -d fixtures/validation/manifest.json
+node scripts/check-schema-descriptions.mjs
 """
 
 [tasks."check:conformance"]
