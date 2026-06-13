@@ -5,6 +5,8 @@
 jq = "1.8.1"
 node = "24.16.0"
 "npm:ajv-cli" = "5.0.0"
+"npm:json-schema-to-typescript" = "15.0.4"
+"npm:typescript" = "6.0.3"
 
 [tasks.setup]
 description = "Install tools and configure Git hooks"
@@ -24,7 +26,7 @@ run = "hk check"
 
 [tasks.test]
 description = "Run tests for this repository"
-depends = ["check:json", "check:schema", "check:conformance"]
+depends = ["check:json", "check:schema", "check:conformance", "check:typescript-generation"]
 
 [tasks."check:json"]
 description = "Validate JSON and JSONL syntax"
@@ -46,6 +48,10 @@ node scripts/check-schema-descriptions.mjs
 [tasks."check:conformance"]
 description = "Validate conformance manifest documentation and diagnostic registry"
 run = "node scripts/check-conformance.mjs"
+
+[tasks."check:typescript-generation"]
+description = "Validate release schema TypeScript generation and smoke contracts"
+run = "node scripts/check-typescript-generation.mjs"
 
 [tasks."check:actions"]
 description = "Validate GitHub Actions workflows"
